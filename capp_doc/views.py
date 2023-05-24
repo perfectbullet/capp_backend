@@ -1,5 +1,5 @@
 import json
-
+import hashlib
 from django.http import JsonResponse
 from django.template import loader
 from django.views import View
@@ -116,14 +116,25 @@ class TemplateView(View):
     """
     html 渲染
     """
+    md5 = hashlib.md5()
 
     def get(self, request):
         response_data = {
             'code': STATUS200,
             'msg': 'ok',
         }
-        template_content = loader.render_to_string('capp_doc/3.html')
+
+        template_path = 'capp_doc/3.html'
+        self.md5.update(template_path.encode('utf-8'))
+        file_name_key = self.md5.hexdigest()
+        context = {
+            'file_name_key': file_name_key,
+            # 这里时 输入框 key 的列表
+            'render_111222333344': '这里通过template id 渲染'
+        }
+        template_content = loader.render_to_string(template_path, context)
         response_data['template_content'] = template_content
+        response_data['file_name_key'] = file_name_key
         return JsonResponse(response_data)
 
 
