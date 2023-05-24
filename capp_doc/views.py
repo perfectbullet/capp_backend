@@ -130,7 +130,9 @@ class TemplateView(View):
         context = {
             'file_name_key': file_name_key,
             # 这里时 输入框 key 的列表
-            'render_111222333344': '这里通过template id 渲染'
+            'render_value_111222333344': '段落',
+            'render_code_111222333344': 'paragraph'
+
         }
         template_content = loader.render_to_string(template_path, context)
         response_data['template_content'] = template_content
