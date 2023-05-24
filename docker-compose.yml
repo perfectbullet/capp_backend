@@ -1,14 +1,31 @@
-version: "3.9"
+version: "3.3"
 
 services:
-  db:
-    image: postgres
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
+  db3:
+    image: mysql:8.0
+    restart: always
+    command:
+      - mysqld
+      - --max_connections=3000
+      - --wait_timeout=600
+      - --interactive_timeout=600
+      - --thread_cache_size=50
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8
+      - --collation-server=utf8_general_ci
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - MYSQL_DATABASE=capp_backend
+      - MYSQL_ROOT_PASSWORD=123456aa
+    ports:
+      - "3304:3306"
+    expose:
+      - "3306"
+    networks:
+      - backnet
+    volumes:
+      - ./datas/mysql/:/var/lib/mysql
+    container_name: db3
+
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8005
@@ -17,8 +34,16 @@ services:
     ports:
       - "8005:8005"
     environment:
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - DJANGO_MYSQL_DATABASE=capp_backend
+      - DJANGO_MYSQL_USER=root
+      - DJANGO_MYSQL_PASSWORD=123456aa
+      - DJANGO_MYSQL_HOST=db3
+      - DJANGO_MYSQL_PORT=3306
     depends_on:
-      - db
+      - db3
+    networks:
+      - backnet
+
+networks:
+  backnet:
+
