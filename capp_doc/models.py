@@ -105,18 +105,18 @@ class Template(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
 
 
-# class CappFileManagment(models.Model):
-#     """
-#     模板表,
-#
-#     子文档的模板
-#     """
-#     file_name = models.CharField(max_length=255, blank=True, null=True)
-#     file_path = models.CharField(max_length=255, blank=True, null=True)
-#     file_type = models.IntegerField(blank=True, null=True)
-#     create_time = models.DateTimeField(blank=True, null=True)
-#     parent_id = models.IntegerField(blank=True, null=True)
-#
-#     class Meta:
-#         managed = False
-#         db_table = 'capp_file_managment'
+class CappFileManagment(models.Model):
+    """
+    模板表,
+
+    子文档的模板
+    """
+    file_name = models.CharField(max_length=255, blank=True, null=True)
+    file_path = models.CharField(max_length=255, blank=True, null=True)
+    file_type = models.IntegerField(blank=True, null=True)
+    create_time = models.DateTimeField(blank=True, null=True)
+    parent_id = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'capp_file_managment'

@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.template import loader
 from django.views import View
 
-from capp_doc.models import EntryType, EntryTypeDict, TaskTypeDict, Task, TaskTemplate
+from capp_doc.models import EntryType, EntryTypeDict, TaskTypeDict, Task, TaskTemplate, CappFileManagment
 from common import const
 
 
@@ -44,6 +44,11 @@ class TaskView(View):
         :param request:
         :return:
         """
+        response_data = {
+            'code': const.STATUS200,
+            'msg': 'ok',
+            'result': {}
+        }
         post_data = json.loads(request.body)
         row_id = post_data.get('id')
         task_name = post_data.get('task_name')
@@ -55,13 +60,31 @@ class TaskView(View):
             'task_type': task_type,
             'task_status': task_status,
         }
-        obj, created = Task.objects.update_or_create(defaults=defaults, id=row_id)
-        return JsonResponse({
+        task_obj, created = Task.objects.update_or_create(defaults=defaults, id=row_id)
+        task_result = {
             'code': const.STATUS200,
             'msg': 'ok',
             'created': created,
-            'id': obj.id
-        })
+            'id': task_obj.id,
+            'task_temp_result': []
+        }
+        response_data['result'] = task_result
+        template_infos = post_data.get('template_infos')
+        for temp_info in template_infos:
+            template_id = temp_info.get('template_id')
+            template_sequence = temp_info.get('template_sequence')
+            row_id = temp_info.get('id')
+            defaults = {
+                'task_id': task_obj.id,
+                'template_id': template_id,
+                'template_sequence': template_sequence,
+            }
+            obj, created = TaskTemplate.objects.update_or_create(defaults=defaults, id=row_id)
+            task_result['task_temp_result'].append({
+                'created': created,
+                'id': obj.id
+            })
+        return JsonResponse(response_data)
 
 
 class TemplateView(View):
@@ -173,7 +196,7 @@ class TaskTemplateView(View):
         task_name = Task.objects.get(id=task_id).task_name
         objs = TaskTemplate.objects.all()
         if task_id:
-            objs = objs.filter(key=task_id)
+            objs = objs.filter(task_id=task_id)
         for obj in objs:
             one_data = {
                 'id': obj.id,
@@ -183,8 +206,7 @@ class TaskTemplateView(View):
                 'task_name': task_name,
             }
             response_data['data'].append(one_data)
-        else:
-            response_data['data'] = {}
+
         return JsonResponse(response_data)
 
     def post(self, request):
@@ -216,3 +238,27 @@ class TaskTemplateView(View):
             'msg': 'ok',
             'result_info': result_info
         })
+
+
+class CappFileManagmentView(View):
+    """
+    子文档模板查询
+    """
+    def get(self, request):
+        response_data = {
+            'code': const.STATUS200,
+            'msg': 'ok',
+            'result': []
+        }
+        objs = CappFileManagment.objects.filter(parent_id__exact=0)
+        for obj in objs:
+            one_data = {
+                'file_name': obj.file_name,
+                'file_path': obj.file_path,
+                'file_type': obj.file_type,
+                'create_time': obj.create_time,
+                'parent_id': obj.parent_id,
+            }
+            response_data['result'].append(one_data)
+
+        return JsonResponse(response_data)
