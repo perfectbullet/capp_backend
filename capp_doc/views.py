@@ -97,10 +97,12 @@ class EntryTypeView(View):
         key = post_data.get('key')
         field_type = post_data.get('field_type')
         html_type = post_data.get('html_type')
+        file_name_key = post_data.get('file_name_key')
 
         defaults = {
             'field_type': field_type,
             'html_type': html_type,
+            'file_name_key': file_name_key
         }
 
         obj, created = EntryType.objects.update_or_create(defaults=defaults, key=key)
@@ -127,13 +129,17 @@ class TemplateView(View):
         template_path = 'capp_doc/3.html'
         self.md5.update(template_path.encode('utf-8'))
         file_name_key = self.md5.hexdigest()
+        ets = EntryType.objects.filter(file_name_key=file_name_key)
         context = {
             'file_name_key': file_name_key,
             # 这里时 输入框 key 的列表
             'render_value_111222333344': '段落',
             'render_code_111222333344': 'paragraph'
-
         }
+        for ef in ets:
+            etd = EntryTypeDict.objects.get(code=ef.field_type)
+            context['render_value_' + ef.key] = etd.name
+
         template_content = loader.render_to_string(template_path, context)
         response_data['template_content'] = template_content
         response_data['file_name_key'] = file_name_key

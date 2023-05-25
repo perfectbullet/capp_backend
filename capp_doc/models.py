@@ -26,6 +26,8 @@ class EntryType(models.Model):
     field_type = models.CharField(max_length=255)
     # html 类型
     html_type = models.CharField(max_length=255)
+    # file_name_key
+    file_name_key = models.CharField(max_length=255, default='')
     date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
