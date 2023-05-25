@@ -33,7 +33,7 @@ class TaskView(View):
                 'task_type': obj.task_type,
                 'task_status': obj.task_status,
                 'date_added': obj.date_added,
-            },
+            }
             response_data['data'].append(one_data)
         return JsonResponse(response_data)
 
