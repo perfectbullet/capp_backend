@@ -136,10 +136,11 @@ class TemplateView(View):
             'render_value_111222333344': '段落',
             'render_code_111222333344': 'paragraph'
         }
+
         for ef in ets:
             etd = EntryTypeDict.objects.get(code=ef.field_type)
             context['render_value_' + ef.key] = etd.name
-
+        print(context)
         template_content = loader.render_to_string(template_path, context)
         response_data['template_content'] = template_content
         response_data['file_name_key'] = file_name_key

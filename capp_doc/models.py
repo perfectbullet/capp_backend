@@ -44,3 +44,20 @@ class EntryTypeDict(models.Model):
     html_type = models.CharField(max_length=255)
     doc_value_type = models.CharField(max_length=255)
     comments = models.CharField(max_length=255)
+
+
+class Task(models.Model):
+    """
+    任务表
+    """
+    task_name = models.CharField(max_length=255, default='test-任务名称')
+    template_key = models.IntegerField(default=1)
+
+
+class Template(models.Model):
+    """
+    模板表
+    """
+    template_name = models.CharField(max_length=255, default='test-任务名称')
+    template_key = models.IntegerField(default=1)
+    file_name = models.CharField(max_length=255, default='test-任务名称')
