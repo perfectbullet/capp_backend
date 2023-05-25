@@ -27,12 +27,12 @@ class TaskView(View):
 
         for obj in objs:
             one_data = {
-                    'id': obj.id,
-                    'task_name': obj.task_name,
-                    'task_type': obj.task_type,
-                    'task_status': obj.task_status,
-                    'date_added': obj.date_added,
-                },
+                'id': obj.id,
+                'task_name': obj.task_name,
+                'task_type': obj.task_type,
+                'task_status': obj.task_status,
+                'date_added': obj.date_added,
+            },
             response_data['data'].append(one_data)
         return JsonResponse(response_data)
 
@@ -97,6 +97,59 @@ class TemplateView(View):
 
 
 class TaskTypeDictView(View):
+    """
+    任务类型，状态字典
+    """
+
+    def get(self, request):
+        query_data = request.GET.dict()
+        response_data = {
+            'code': const.STATUS200,
+            'msg': 'ok',
+            'data': []
+        }
+        code_type = query_data.get('code_type')
+        objs = TaskTypeDict.objects.all()
+        if code_type:
+            objs = objs.filter(key=code_type)
+        if objs:
+            for obj in objs:
+                one_data = {
+                    'id': obj.id,
+                    'code': obj.code,
+                    'name': obj.name,
+                    'code_type': obj.code_type,
+                    'comments': obj.comments,
+                }
+                response_data['data'].append(one_data)
+        else:
+            response_data['data'] = {}
+        return JsonResponse(response_data)
+
+    def post(self, request):
+        post_data = json.loads(request.body)
+        code = post_data.get('code')
+        code_type = post_data.get('code_type')
+        name = post_data.get('name')
+        comments = post_data.get('comments')
+        row_id = post_data.get('id')
+        defaults = {
+            'code': code,
+            'name': name,
+            'code_type': code_type,
+            'comments': comments,
+        }
+
+        obj, created = TaskTypeDict.objects.update_or_create(defaults=defaults, id=row_id)
+        return JsonResponse({
+            'code': const.STATUS200,
+            'msg': 'ok',
+            'created': created,
+            'id': obj.id
+        })
+
+
+class TaskTemplateView(View):
     """
     任务类型，状态字典
     """

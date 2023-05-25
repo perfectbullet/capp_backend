@@ -97,7 +97,7 @@ class EntryTypeView(View):
         key = post_data.get('key')
         field_type = post_data.get('field_type')
         html_type = post_data.get('html_type')
-        file_name_key = post_data.get('file_name_key')
+        file_name_key = post_data.get('file_name_key', '')
 
         defaults = {
             'field_type': field_type,
