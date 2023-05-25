@@ -68,6 +68,7 @@ class TaskView(View):
             'id': task_obj.id,
             'task_temp_result': []
         }
+        print(task_result)
         response_data['result'] = task_result
         template_infos = post_data.get('template_infos')
         for temp_info in template_infos:
