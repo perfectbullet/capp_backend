@@ -261,5 +261,4 @@ class CappFileManagmentView(View):
                 'parent_id': obj.parent_id,
             }
             response_data['data'].append(one_data)
-
         return JsonResponse(response_data)
