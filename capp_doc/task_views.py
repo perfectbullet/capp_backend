@@ -253,6 +253,7 @@ class CappFileManagmentView(View):
         objs = CappFileManagment.objects.filter(parent_id__exact=0)
         for obj in objs:
             one_data = {
+                'id': obj.id,
                 'file_name': obj.file_name,
                 'file_path': obj.file_path,
                 'file_type': obj.file_type,
