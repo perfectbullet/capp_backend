@@ -248,7 +248,7 @@ class CappFileManagmentView(View):
         response_data = {
             'code': const.STATUS200,
             'msg': 'ok',
-            'result': []
+            'data': []
         }
         objs = CappFileManagment.objects.filter(parent_id__exact=0)
         for obj in objs:
@@ -259,6 +259,6 @@ class CappFileManagmentView(View):
                 'create_time': obj.create_time,
                 'parent_id': obj.parent_id,
             }
-            response_data['result'].append(one_data)
+            response_data['data'].append(one_data)
 
         return JsonResponse(response_data)
