@@ -3,11 +3,12 @@
 from django.urls import path
 
 from . import views
-from .task_views import TaskTypeDictView, TaskView
+from .task_views import TaskTypeDictView, TaskView, TaskTemplateView
 
 app_name = 'capp_doc'
 urlpatterns = [
     path('task', TaskView.as_view(), name='TaskTypeDictView'),
+    path('task_template_view', TaskTemplateView.as_view(), name='task template view'),
     path('task_type_dict', TaskTypeDictView.as_view(), name='TaskTypeDictView'),
     path('entry_type', views.EntryTypeView.as_view(), name='get entry type'),
     path('entry_data', views.EntryView.as_view(), name='get entry'),

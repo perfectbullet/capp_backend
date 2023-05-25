@@ -1,8 +1,10 @@
 import json
 import hashlib
+import os
 from django.http import JsonResponse
 from django.template import loader
 from django.views import View
+from django.conf import settings
 
 from capp_doc.models import Entry, EntryType, EntryTypeDict
 
@@ -14,6 +16,20 @@ class EntryView(View):
     """
     数据类型视图
     """
+
+    def handle_uploaded_file(self, f, tag_id):
+        """
+        按 tag_id 保存数据
+        :param f:
+        :param tag_id:
+        :return:
+        """
+        file_path = os.path.join(settings.BASE_DIR, 'capp_doc', 'tag_files', tag_id)
+        with open(file_path, 'wb+') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
+        return file_path
+
     def get(self, request):
         query_data = request.GET.dict()
         response_data = {
@@ -41,19 +57,28 @@ class EntryView(View):
     def post(self, request):
         """
         新增或者修改，
-        提供 row_id 时修改
+        提供 row_id 时修改 taskId,templeteId,spaceId
         :param request:
         :return:
         """
-        post_data = json.loads(request.body)
+        post_data = request.POST
         row_id = post_data.get('id')
-        entry_type_key = post_data.get('entry_type_key')
-        value = post_data.get('value')
+        # 任务id
+        task_id = post_data.get('task_id')
+        # 模板id
+        template_id = post_data.get('template_id')
+        # 子文档标记区域的 tag_id
+        tag_id = post_data.get('tag_id')
+        # tag_file 子文档二进制对象
+        tag_file = request.FILES['tag_file']
+        tag_file_path = self.handle_uploaded_file(tag_file, tag_id)
         defaults = {
-            'value': value,
-            'entry_type_key': entry_type_key
+            'task_id': task_id,
+            'template_id': template_id,
+            'tag_id': tag_id,
+            'tag_file': tag_file_path,
+            'tag_file_url': tag_file_path,
         }
-
         obj, created = Entry.objects.update_or_create(defaults=defaults, id=row_id)
         return JsonResponse({
             'code': STATUS200,

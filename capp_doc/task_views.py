@@ -1,10 +1,11 @@
-import json
 import hashlib
+import json
+
 from django.http import JsonResponse
 from django.template import loader
 from django.views import View
 
-from capp_doc.models import Entry, EntryType, EntryTypeDict, TaskTypeDict, Task
+from capp_doc.models import EntryType, EntryTypeDict, TaskTypeDict, Task, TaskTemplate
 from common import const
 
 
@@ -151,52 +152,67 @@ class TaskTypeDictView(View):
 
 class TaskTemplateView(View):
     """
-    任务类型，状态字典
+    任务-子文档
+
+    任务下选择的模板
     """
 
     def get(self, request):
+        """
+        查询任务模板
+        :param request:
+        :return:
+        """
         query_data = request.GET.dict()
         response_data = {
             'code': const.STATUS200,
             'msg': 'ok',
             'data': []
         }
-        code_type = query_data.get('code_type')
-        objs = TaskTypeDict.objects.all()
-        if code_type:
-            objs = objs.filter(key=code_type)
-        if objs:
-            for obj in objs:
-                one_data = {
-                    'id': obj.id,
-                    'code': obj.code,
-                    'name': obj.name,
-                    'code_type': obj.code_type,
-                    'comments': obj.comments,
-                }
-                response_data['data'].append(one_data)
+        task_id = query_data.get('task_id')
+        task_name = Task.objects.get(id=task_id).task_name
+        objs = TaskTemplate.objects.all()
+        if task_id:
+            objs = objs.filter(key=task_id)
+        for obj in objs:
+            one_data = {
+                'id': obj.id,
+                'task_id': obj.task_id,
+                'template_id': obj.template_id,
+                'template_sequence': obj.template_sequence,
+                'task_name': task_name,
+            }
+            response_data['data'].append(one_data)
         else:
             response_data['data'] = {}
         return JsonResponse(response_data)
 
     def post(self, request):
-        post_data = json.loads(request.body)
-        code = post_data.get('code')
-        code_type = post_data.get('code_type')
-        name = post_data.get('name')
-        comments = post_data.get('comments')
-        row_id = post_data.get('id')
-        defaults = {
-            'code': code,
-            'name': name,
-            'code_type': code_type,
-            'comments': comments,
-        }
+        """
 
-        obj, created = TaskTypeDict.objects.update_or_create(defaults=defaults, id=row_id)
+        :param request:
+        :return:
+        """
+        post_data = json.loads(request.body)
+        task_id = post_data.get('task_id')
+        template_infos = post_data.get('template_infos')
+        result_info = []
+        for temp_info in template_infos:
+            template_id = temp_info.get('template_id')
+            template_sequence = temp_info.get('template_sequence')
+            row_id = temp_info.get('id')
+            defaults = {
+                'task_id': task_id,
+                'template_id': template_id,
+                'template_sequence': template_sequence,
+            }
+            obj, created = TaskTemplate.objects.update_or_create(defaults=defaults, id=row_id)
+            result_info.append({
+                'created': created,
+                'id': obj.id
+            })
         return JsonResponse({
             'code': const.STATUS200,
             'msg': 'ok',
-            'created': created,
-            'id': obj.id
+            'result_info': result_info
         })

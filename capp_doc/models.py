@@ -6,14 +6,15 @@ class Entry(models.Model):
     """
     数据实体
     """
-    # 数据类型的主键
-    entry_type_key = models.IntegerField()
-    value = models.TextField()
-    date_added = models.DateTimeField(auto_now_add=True)
+    task_id = models.IntegerField(default=2)
+    template_id = models.IntegerField(default=2)
+    tag_id = models.CharField(max_length=255, default='empty')
+    tag_file = models.CharField(max_length=255, default='empty')
+    tag_file_url = models.CharField(max_length=255, default='empty')
 
     def __str__(self):
         """Return a string representation of the model."""
-        return f"{self.value[:50]}..."
+        return f"{self.tag_file}..."
 
 
 class EntryType(models.Model):
@@ -89,11 +90,33 @@ class TaskTemplate(models.Model):
 
 class Template(models.Model):
     """
-    模板表
+    模板表, 暂时无用， capp_file_managment 作为替代
+
+    子文档的模板
     """
-    template_name = models.CharField(max_length=255, default='template_name')
-    file_name = models.CharField(max_length=255, default='file_name')
-    file_file_path = models.CharField(max_length=255, default='file_file_path')
+    # 子文档模板名称
+    template_name = models.CharField(max_length=255, default='')
+    # 模板类型 normal
+    template_type = models.CharField(max_length=255, default='normal')
+    file_name = models.CharField(max_length=255, default='')
+    file_file_path = models.CharField(max_length=255, default='')
     # 模板原来得文件路径（或者名称什么的）
-    template_from = models.CharField(max_length=255, default='file_file_path')
+    template_from = models.CharField(max_length=255, default='')
     date_added = models.DateTimeField(auto_now_add=True)
+
+
+# class CappFileManagment(models.Model):
+#     """
+#     模板表,
+#
+#     子文档的模板
+#     """
+#     file_name = models.CharField(max_length=255, blank=True, null=True)
+#     file_path = models.CharField(max_length=255, blank=True, null=True)
+#     file_type = models.IntegerField(blank=True, null=True)
+#     create_time = models.DateTimeField(blank=True, null=True)
+#     parent_id = models.IntegerField(blank=True, null=True)
+#
+#     class Meta:
+#         managed = False
+#         db_table = 'capp_file_managment'
