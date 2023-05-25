@@ -51,7 +51,7 @@ class TaskTypeDict(models.Model):
     数据类型枚举
     """
     # 字典 code
-    # 任务状态  distributing 下发中   distribute_ok  下发完成  task_done  任务完成  task_save  任务保存
+    # task_status 任务状态  distributing 下发中   distribute_ok  下发完成  task_done  任务完成  task_save  任务保存
     # 任务类型    单装备任务   single_task   工程任务   project_task
     code = models.CharField(max_length=255)
     # 字典 中文名称

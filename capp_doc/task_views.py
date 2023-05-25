@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.template import loader
 from django.views import View
 
-from capp_doc.models import Entry, EntryType, EntryTypeDict, TaskTypeDict
+from capp_doc.models import Entry, EntryType, EntryTypeDict, TaskTypeDict, Task
 from common import const
 
 
@@ -20,21 +20,20 @@ class TaskView(View):
             'msg': 'ok',
             'data': []
         }
-        row_id = query_data.get('id')
-        obj = Entry.objects.filter(id=row_id)
-        if obj:
-            response_data = {
-                'code': const.STATUS200,
-                'msg': 'ok',
-                'data': [{
+        task_name = query_data.get('task_name')
+        objs = Task.objects.all()
+        if task_name:
+            objs = objs.filter(task_name__contains=task_name)
+
+        for obj in objs:
+            one_data = {
                     'id': obj.id,
-                    'value': obj.value,
-                    'entry_type_key': obj.entry_type_key,
+                    'task_name': obj.task_name,
+                    'task_type': obj.task_type,
+                    'task_status': obj.task_status,
+                    'date_added': obj.date_added,
                 },
-                ]
-            }
-        else:
-            response_data['data'] = {}
+            response_data['data'].append(one_data)
         return JsonResponse(response_data)
 
     def post(self, request):
@@ -46,14 +45,16 @@ class TaskView(View):
         """
         post_data = json.loads(request.body)
         row_id = post_data.get('id')
-        entry_type_key = post_data.get('entry_type_key')
-        value = post_data.get('value')
-        defaults = {
-            'value': value,
-            'entry_type_key': entry_type_key
-        }
+        task_name = post_data.get('task_name')
+        task_type = post_data.get('task_type')
+        task_status = post_data.get('task_status')
 
-        obj, created = Entry.objects.update_or_create(defaults=defaults, id=row_id)
+        defaults = {
+            'task_name': task_name,
+            'task_type': task_type,
+            'task_status': task_status,
+        }
+        obj, created = Task.objects.update_or_create(defaults=defaults, id=row_id)
         return JsonResponse({
             'code': const.STATUS200,
             'msg': 'ok',
